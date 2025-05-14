@@ -1,0 +1,5 @@
+C:/Users/moato/Documents/Unity/syrestigen/.utmp/RelWithDebInfo/313f4p3s/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Users/moato/Documents/Unity/syrestigen/.utmp/RelWithDebInfo/313f4p3s/arm64-v8a/CMakeFiles/rebuild_cache.dir
+C:/Users/moato/Documents/Unity/syrestigen/.utmp/RelWithDebInfo/313f4p3s/arm64-v8a/GameActivity/CMakeFiles/game.dir
+C:/Users/moato/Documents/Unity/syrestigen/.utmp/RelWithDebInfo/313f4p3s/arm64-v8a/GameActivity/CMakeFiles/edit_cache.dir
+C:/Users/moato/Documents/Unity/syrestigen/.utmp/RelWithDebInfo/313f4p3s/arm64-v8a/GameActivity/CMakeFiles/rebuild_cache.dir
