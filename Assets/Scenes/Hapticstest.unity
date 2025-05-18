@@ -6223,6 +6223,12 @@ MonoBehaviour:
   hapticAndAudioClips:
   - audioClip: {fileID: 8300000, guid: c89fb7c94f91bdf4fb4c75f7a06d9f91, type: 3}
     hapticClip: {fileID: 2460798210113038985, guid: 4a69276f7eabf9d478a3dd79a8493e3e, type: 3}
+  - audioClip: {fileID: 8300000, guid: 4908389cd45a9cc499e918a859a8f985, type: 3}
+    hapticClip: {fileID: 2460798210113038985, guid: bf97d8a66820da54dbe19e115b16d702, type: 3}
+  - audioClip: {fileID: 8300000, guid: 5a3942177b727684a8796de0c4fff284, type: 3}
+    hapticClip: {fileID: 2460798210113038985, guid: cfba40b344d8e2a4aa3740d4238746db, type: 3}
+  - audioClip: {fileID: 8300000, guid: c5f2804005df3dc43a3bd36b17ebe742, type: 3}
+    hapticClip: {fileID: 2460798210113038985, guid: 2ee1d544b5f618143af20065c7246a39, type: 3}
   audioSource: {fileID: 904179898}
   hapticClipName: {fileID: 328713248}
   leftController: 0
