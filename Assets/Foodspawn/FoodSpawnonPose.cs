@@ -1,7 +1,7 @@
 using UnityEngine;
 using Oculus.Interaction;
 
-public class SpawnOnSelector : MonoBehaviour
+public class SpawnOnPinchPose : MonoBehaviour
 {
     [Header("Detection via ISelector")]
     [SerializeField, Interface(typeof(ISelector))]
@@ -12,6 +12,12 @@ public class SpawnOnSelector : MonoBehaviour
     [Header("Prefab & Position")]
     public GameObject cubePrefab;
     public Transform pinchPoint;
+
+    [Header("Matlogik")]
+    public FoodManager foodManager;
+
+    [Header("Ljud")]
+    public AudioSource deniedSound;
 
     private GameObject spawnedCube;
 
@@ -48,20 +54,28 @@ public class SpawnOnSelector : MonoBehaviour
 
     private void OnSelected()
     {
+        if (foodManager != null && foodManager.IsFull)
+        {
+            Debug.Log("? Goylie är mätt – kan inte spawna fler frukter.");
+            if (deniedSound != null)
+            {
+                deniedSound.Play();
+            }
+            return;
+        }
+
         if (spawnedCube != null)
         {
-            // Gest igen = ta bort kub
             Destroy(spawnedCube);
             spawnedCube = null;
-            Debug.Log("??? Tog bort kuben.");
+            Debug.Log("??? Tog bort frukten.");
         }
         else
         {
-            // Skapa ny kub i handen
             spawnedCube = Instantiate(cubePrefab, pinchPoint.position, pinchPoint.rotation);
             spawnedCube.transform.SetParent(pinchPoint, worldPositionStays: false);
             spawnedCube.transform.localPosition = Vector3.zero;
-            Debug.Log("? Spawnade ny kub vid pinchPoint!");
+            Debug.Log("? Spawnade ny frukt!");
         }
     }
 }
