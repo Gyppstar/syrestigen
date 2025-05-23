@@ -1,30 +1,34 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
 
 public class FoodManager : MonoBehaviour
 {
-    [Header("M‰ttnadsinst‰llningar")]
-    [Tooltip("Hur mÂnga frukter som kr‰vs fˆr att Goylie ska bli m‰tt")]
+    [Header("M√§ttnadsinst√§llningar")]
+    [Tooltip("Hur m√•nga frukter som kr√§vs f√∂r att Goylie ska bli m√§tt")]
     public int maxFeedLevel = 5;
 
-    [Tooltip("Antal frukter som Goylie ‰tit")]
+    [Tooltip("Antal frukter som Goylie √§tit")]
     public int currentFeedLevel = 0;
 
-    [Tooltip("Ljud n‰r frukt matas")]
+    [Tooltip("Ljud n√§r frukt matas")]
     public AudioSource feedSound;
 
     [Header("UI - HungerBar")]
     public Image foodBarImage;
     public Sprite emptySprite;   // 0/5
-    public Sprite lowSprite;     // 1ñ2/5
-    public Sprite mediumSprite;  // 3ñ4/5
+    public Sprite lowSprite;     // 1‚Äì2/5
+    public Sprite mediumSprite;  // 3‚Äì4/5
     public Sprite fullSprite;    // 5/5
 
     [Header("Event (valfritt)")]
     public UnityEvent<float> OnHungerChanged;
 
-    // Gˆr att andra scripts kan se om Goylie ‰r m‰tt
+    [Header("Haptics")]
+    [Tooltip("Spelas n√§r Goylie matas")]
+    public FeedHapticsPlayer hapticsPlayer;
+
+    // G√∂r att andra scripts kan se om Goylie √§r m√§tt
     public bool IsFull => currentFeedLevel >= maxFeedLevel;
 
     private void Start()
@@ -37,7 +41,7 @@ public class FoodManager : MonoBehaviour
     {
         if (IsFull)
         {
-            Debug.Log("? Goylie ‰r redan m‰tt.");
+            Debug.Log("? Goylie √§r redan m√§tt.");
             return;
         }
 
@@ -49,12 +53,22 @@ public class FoodManager : MonoBehaviour
             feedSound.Play();
         }
 
+        // ‚úÖ Trigger haptic feedback
+        if (hapticsPlayer != null)
+        {
+            hapticsPlayer.PlayHaptics();
+        }
+        else
+        {
+            Debug.LogWarning("Ingen FeedHapticsPlayer tilldelad.");
+        }
+
         UpdateBar();
         OnHungerChanged?.Invoke((float)currentFeedLevel / maxFeedLevel);
 
         if (IsFull)
         {
-            Debug.Log("? Goylie ‰r nu m‰tt!");
+            Debug.Log("? Goylie √§r nu m√§tt!");
         }
     }
 
@@ -66,7 +80,7 @@ public class FoodManager : MonoBehaviour
             return;
         }
 
-        // Visa r‰tt sprite beroende pÂ m‰ttnadsnivÂ
+        // Visa r√§tt sprite beroende p√• m√§ttnadsniv√•
         if (currentFeedLevel >= maxFeedLevel)
         {
             foodBarImage.sprite = fullSprite;
