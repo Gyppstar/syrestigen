@@ -1,11 +1,11 @@
 ﻿using UnityEngine;
-using Oculus.Haptics; // Meta XR Haptics
+using Oculus.Haptics;
 
 public class PetGoylie : MonoBehaviour
 {
     [Header("Responskomponenter")]
     public AudioSource purrAudio;
-    public HapticSource haptics; // Meta XR Haptics komponent
+    public HapticSource haptics;
     public GameObject heartParticles;
 
     [Header("Inställningar")]
@@ -31,52 +31,27 @@ public class PetGoylie : MonoBehaviour
     {
         if (other.CompareTag("Hand") || other.name.Contains("Hand"))
         {
-            ResetPetting();
+            petTimer = 0f;
+            isBeingPetted = false;
+
+            if (purrAudio != null) purrAudio.Stop();
+            if (heartParticles != null) heartParticles.SetActive(false);
+            if (haptics != null) haptics.Stop();
         }
     }
 
     private void ActivateGoylieResponse()
     {
         isBeingPetted = true;
-        Debug.Log("🐾 Goylie reagerar på klapp!");
+        Debug.Log("🐉 Goylie reagerar på klapp!");
 
-        // 🎵 Spela ljud
         if (purrAudio != null && !purrAudio.isPlaying)
-        {
             purrAudio.Play();
-        }
 
-        // 🔊 Spela haptics
         if (haptics != null)
-        {
-            haptics.Play(); // Spelar hapticklippet en gång
-        }
+            haptics.Play();
 
-        // 💖 Visa hjärtpartiklar
         if (heartParticles != null)
-        {
             heartParticles.SetActive(true);
-        }
-    }
-
-    private void ResetPetting()
-    {
-        petTimer = 0f;
-        isBeingPetted = false;
-
-        if (purrAudio != null)
-        {
-            purrAudio.Stop();
-        }
-
-        if (haptics != null)
-        {
-            haptics.Stop();
-        }
-
-        if (heartParticles != null)
-        {
-            heartParticles.SetActive(false);
-        }
     }
 }
