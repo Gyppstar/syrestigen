@@ -5,97 +5,94 @@ using UnityEngine.Events;
 public class FoodManager : MonoBehaviour
 {
     [Header("Mättnadsinställningar")]
-    [Tooltip("Hur många frukter som krävs för att Goylie ska bli mätt")]
     public int maxFeedLevel = 5;
-
-    [Tooltip("Antal frukter som Goylie ätit")]
     public int currentFeedLevel = 0;
-
-    [Tooltip("Ljud när frukt matas")]
     public AudioSource feedSound;
 
     [Header("UI - HungerBar")]
     public Image foodBarImage;
-    public Sprite emptySprite;   // 0/5
-    public Sprite lowSprite;     // 1–2/5
-    public Sprite mediumSprite;  // 3–4/5
-    public Sprite fullSprite;    // 5/5
+    public Sprite emptySprite;
+    public Sprite lowSprite;
+    public Sprite mediumSprite;
+    public Sprite fullSprite;
 
     [Header("Event (valfritt)")]
     public UnityEvent<float> OnHungerChanged;
 
     [Header("Haptics")]
-    [Tooltip("Spelas när Goylie matas")]
     public FeedHapticsPlayer hapticsPlayer;
 
-    // Gör att andra scripts kan se om Goylie är mätt
+    [Header("Animation")]
+    public Animator animator;  // ← Add this
+    private int eatingLayerIndex;
+
     public bool IsFull => currentFeedLevel >= maxFeedLevel;
 
     private void Start()
     {
-        currentFeedLevel = 0; // Startar hungrig
+        currentFeedLevel = 0;
         UpdateBar();
+
+        if (animator != null)
+        {
+            eatingLayerIndex = animator.GetLayerIndex("Eating");
+            animator.SetLayerWeight(eatingLayerIndex, 0f);
+        }
     }
 
     public void FeedGoylie()
     {
         if (IsFull)
         {
-            Debug.Log("? Goylie är redan mätt.");
+            Debug.Log("🟡 Goylie är redan mätt.");
             return;
         }
 
         currentFeedLevel++;
-        Debug.Log($"?? Goylie matad: {currentFeedLevel}/{maxFeedLevel}");
+        Debug.Log($"🍎 Goylie matad: {currentFeedLevel}/{maxFeedLevel}");
 
-        if (feedSound != null)
-        {
-            feedSound.Play();
-        }
-
-        // ✅ Trigger haptic feedback
-        if (hapticsPlayer != null)
-        {
-            hapticsPlayer.PlayHaptics();
-        }
-        else
-        {
-            Debug.LogWarning("Ingen FeedHapticsPlayer tilldelad.");
-        }
+        if (feedSound != null) feedSound.Play();
+        if (hapticsPlayer != null) hapticsPlayer.PlayHaptics();
 
         UpdateBar();
         OnHungerChanged?.Invoke((float)currentFeedLevel / maxFeedLevel);
 
+        // ✅ Animate eating
+        if (animator != null)
+        {
+            animator.SetBool("IsEating", true);
+            animator.SetLayerWeight(eatingLayerIndex, 1f);
+
+            // Optional: Reset after 2 seconds
+            Invoke(nameof(ResetEatingAnimation), 2f);
+        }
+
         if (IsFull)
         {
-            Debug.Log("? Goylie är nu mätt!");
+            Debug.Log("✅ Goylie är nu mätt!");
+        }
+    }
+
+    private void ResetEatingAnimation()
+    {
+        if (animator != null)
+        {
+            animator.SetBool("IsEating", false);
+            animator.SetLayerWeight(eatingLayerIndex, 0f);
         }
     }
 
     private void UpdateBar()
     {
-        if (foodBarImage == null)
-        {
-            Debug.LogWarning("?? Ingen FoodBar UI tilldelad.");
-            return;
-        }
+        if (foodBarImage == null) return;
 
-        // Visa rätt sprite beroende på mättnadsnivå
         if (currentFeedLevel >= maxFeedLevel)
-        {
             foodBarImage.sprite = fullSprite;
-        }
         else if (currentFeedLevel >= maxFeedLevel - 2)
-        {
             foodBarImage.sprite = mediumSprite;
-        }
         else if (currentFeedLevel >= 1)
-        {
             foodBarImage.sprite = lowSprite;
-        }
         else
-        {
             foodBarImage.sprite = emptySprite;
-        }
     }
 }

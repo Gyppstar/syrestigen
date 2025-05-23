@@ -7,12 +7,23 @@ public class PetGoylie : MonoBehaviour
     public AudioSource purrAudio;
     public HapticSource haptics;
     public GameObject heartParticles;
+    public Animator animator;  // ← Add this
 
     [Header("Inställningar")]
     public float activationTime = 1.5f;
 
     private float petTimer = 0f;
     private bool isBeingPetted = false;
+    private int pettingLayerIndex;
+
+    private void Start()
+    {
+        if (animator != null)
+        {
+            pettingLayerIndex = animator.GetLayerIndex("Petting");
+            animator.SetLayerWeight(pettingLayerIndex, 0f); // Make sure it doesn't play on start
+        }
+    }
 
     private void OnTriggerStay(Collider other)
     {
@@ -37,6 +48,12 @@ public class PetGoylie : MonoBehaviour
             if (purrAudio != null) purrAudio.Stop();
             if (heartParticles != null) heartParticles.SetActive(false);
             if (haptics != null) haptics.Stop();
+
+            if (animator != null)
+            {
+                animator.SetBool("IsPetting", false);
+                animator.SetLayerWeight(pettingLayerIndex, 0f);
+            }
         }
     }
 
@@ -53,5 +70,11 @@ public class PetGoylie : MonoBehaviour
 
         if (heartParticles != null)
             heartParticles.SetActive(true);
+
+        if (animator != null)
+        {
+            animator.SetBool("IsPetting", true);
+            animator.SetLayerWeight(pettingLayerIndex, 1f);
+        }
     }
 }
