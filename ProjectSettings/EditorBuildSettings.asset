@@ -12,7 +12,7 @@ EditorBuildSettings:
     path: Assets/Scenes/UIstart.scene.unity
     guid: cb91f7128b33ae846bd15704e8eb823f
   - enabled: 1
-    path: Assets/Haptics/Haptic2.unity
+    path: Assets/Scenes/Haptic2.unity
     guid: 6b2f1625ea5fc504dae32aa73daeab74
   - enabled: 1
     path: Assets/MRMainScene.unity
