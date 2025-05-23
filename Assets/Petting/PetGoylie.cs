@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using Oculus.Haptics; // Meta XR Haptics
 
 public class PetGoylie : MonoBehaviour
@@ -8,8 +8,8 @@ public class PetGoylie : MonoBehaviour
     public HapticSource haptics; // Meta XR Haptics komponent
     public GameObject heartParticles;
 
-    [Header("Inst�llningar")]
-    public float activationTime = 1.5f; // Tid innan reaktion
+    [Header("Inställningar")]
+    public float activationTime = 1.5f;
 
     private float petTimer = 0f;
     private bool isBeingPetted = false;
@@ -31,27 +31,52 @@ public class PetGoylie : MonoBehaviour
     {
         if (other.CompareTag("Hand") || other.name.Contains("Hand"))
         {
-            petTimer = 0f;
-            isBeingPetted = false;
-
-            if (purrAudio != null) purrAudio.Stop();
-            if (heartParticles != null) heartParticles.SetActive(false);
-            if (haptics != null) haptics.Stop();
+            ResetPetting();
         }
     }
 
     private void ActivateGoylieResponse()
     {
         isBeingPetted = true;
-        Debug.Log("?? Goylie reagerar p� klapp!");
+        Debug.Log("🐾 Goylie reagerar på klapp!");
 
+        // 🎵 Spela ljud
         if (purrAudio != null && !purrAudio.isPlaying)
+        {
             purrAudio.Play();
+        }
+
+        // 🔊 Spela haptics
+        if (haptics != null)
+        {
+            haptics.Play(); // Spelar hapticklippet en gång
+        }
+
+        // 💖 Visa hjärtpartiklar
+        if (heartParticles != null)
+        {
+            heartParticles.SetActive(true);
+        }
+    }
+
+    private void ResetPetting()
+    {
+        petTimer = 0f;
+        isBeingPetted = false;
+
+        if (purrAudio != null)
+        {
+            purrAudio.Stop();
+        }
 
         if (haptics != null)
-            haptics.Play(); // Ingen IsPlaying � Play() funkar oavsett
+        {
+            haptics.Stop();
+        }
 
         if (heartParticles != null)
-            heartParticles.SetActive(true);
+        {
+            heartParticles.SetActive(false);
+        }
     }
 }
