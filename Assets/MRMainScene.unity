@@ -20825,7 +20825,7 @@ MonoBehaviour:
   foodManager: {fileID: 1609314505}
   deniedSound: {fileID: 0}
   guideAudioSource: {fileID: 1697771377}
-  guidePopClip: {fileID: 0}
+  guidePopClip: {fileID: 8300000, guid: 475e38931bb763641bca41bda3df09f0, type: 3}
   guideImage: {fileID: 183717418}
   guideDelay: 5
   hideDelayAfterGesture: 2
