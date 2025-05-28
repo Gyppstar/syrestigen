@@ -9,6 +9,8 @@ TagManager:
   - Dragonfruit
   - Goylie
   - Hand
+  - Hazard
+  - Collectible
   layers:
   - Default
   - TransparentFX
