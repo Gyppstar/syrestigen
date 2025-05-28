@@ -12754,7 +12754,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canvasA: {fileID: 1649272100}
   canvasB: {fileID: 667975649}
-  sceneToLoad: MRMainScene
+  sceneToLoad: UIEggCrack
 --- !u!4 &1109661580
 Transform:
   m_ObjectHideFlags: 0
