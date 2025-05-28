@@ -2,18 +2,18 @@ using UnityEngine;
 
 public class FallingObject : MonoBehaviour
 {
-    [Header("Falling Settings")]
-    public float fallSpeed = 2f;
-
     [Header("Despawn Settings")]
-    public float despawnY = -5f;
+    public float despawnY = -8f;
 
     [Header("Lock Settings")]
     public float lockZ = 17f;
 
     void Update()
     {
-        // Move downward
+        // Use global fall speed from GameManager
+        float fallSpeed = GameManager.instance.currentFallSpeed;
+
+        // Fall movement
         transform.Translate(Vector3.down * fallSpeed * Time.deltaTime);
 
         // Lock Z position

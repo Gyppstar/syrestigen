@@ -10,12 +10,16 @@ public class GameManager : MonoBehaviour
     public TMP_Text scoreText;
     public Image[] hearts;
 
+    [Header("Falling Speed Control")]
+    public float currentFallSpeed = 1f;
+    public float maxFallSpeed = 5f;
+    public float fallSpeedIncreaseRate = 0.1f;
+
     private int score = 0;
     private int health;
 
     void Awake()
     {
-        // Singleton reference
         if (instance == null)
         {
             instance = this;
@@ -28,17 +32,26 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    void Update()
+    {
+        // Speed ramps up over time
+        if (currentFallSpeed < maxFallSpeed)
+        {
+            currentFallSpeed += fallSpeedIncreaseRate * Time.deltaTime;
+        }
+    }
+
     public void AddScore(int amount)
     {
         score += amount;
-        Debug.Log("Score updated to: " + score); // Debug log
+        Debug.Log("Score updated to: " + score);
         UpdateUI();
     }
 
     public void TakeDamage(int amount)
     {
         health -= amount;
-        Debug.Log("Took damage. Health: " + health); // Debug log
+        Debug.Log("Took damage. Health: " + health);
         UpdateUI();
 
         if (health <= 0)
@@ -63,7 +76,6 @@ public class GameManager : MonoBehaviour
     void GameOver()
     {
         Debug.Log("Game Over!");
-        // Freeze the game or trigger a game over screen
         Time.timeScale = 0f;
     }
 }
