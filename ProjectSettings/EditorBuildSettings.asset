@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/Scenes/UIstart.scene.unity
     guid: cb91f7128b33ae846bd15704e8eb823f
   - enabled: 1
+    path: Assets/UIEggCrack.unity
+    guid: ef4abfb66a2e84b51979325dde31a346
+  - enabled: 1
     path: Assets/MRMainScene.unity
     guid: 9d15080088fcd6d4e86cd66bb5920b7b
   m_configObjects:
