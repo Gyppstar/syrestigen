@@ -40,6 +40,7 @@ public class FoodManager : MonoBehaviour
         }
     }
 
+    [System.Obsolete]
     public void FeedGoylie()
     {
         if (IsFull)
@@ -70,8 +71,15 @@ public class FoodManager : MonoBehaviour
         if (IsFull)
         {
             Debug.Log("✅ Goylie är nu mätt!");
+
+            // 🔔 Visa sovprompt
+            SleepController sleepController = FindObjectOfType<SleepController>();
+            if (sleepController != null)
+            {
+                sleepController.ShowSleepPrompt();
+            }
         }
-    }
+        }
 
     private void ResetEatingAnimation()
     {
