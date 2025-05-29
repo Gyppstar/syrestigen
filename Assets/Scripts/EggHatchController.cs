@@ -1,25 +1,32 @@
 using UnityEngine;
+using Oculus.Haptics;
 
 public class EggHatchController : MonoBehaviour
 {
+    [Header("References")]
     public GameObject eggWhole;
     public GameObject eggBrokenRoot;
     public GameObject dragon;
     public ParticleSystem particles;
+    public AudioSource shakeAudio;
+    public HapticSource haptics;
 
+    [Header("Timings")]
     public float shakeDuration = 2f;
     public float shakeIntensity = 0.005f;
     public float delayBeforeHatch = 1.5f;
-    public float timeBeforeShowDragon = 1.0f;         // ⬅️ Tidigare visning av draken
+
+    [Tooltip("Time to wait after hatch begins before triggering haptics and audio")]
+    public float delayBeforeHapticsAndAudio = 0.5f;
+
+    public float timeBeforeShowDragon = 1.0f;
     public float timeBeforeRemovePieces = 3.0f;
 
     private Vector3 originalPos;
-    private AudioSource audioSource;
 
     void Start()
     {
         originalPos = eggWhole.transform.position;
-        audioSource = GetComponent<AudioSource>();
         StartCoroutine(HatchSequence());
     }
 
@@ -27,11 +34,14 @@ public class EggHatchController : MonoBehaviour
     {
         yield return new WaitForSeconds(delayBeforeHatch);
 
-        // Spela ljud (om det finns)
-        if (audioSource != null)
-            audioSource.Play();
+        yield return new WaitForSeconds(delayBeforeHapticsAndAudio);
 
-        // Skaka ägget
+        if (shakeAudio != null && !shakeAudio.isPlaying)
+            shakeAudio.Play();
+
+        if (haptics != null)
+            haptics.Play();
+
         float elapsed = 0f;
         while (elapsed < shakeDuration)
         {
@@ -41,9 +51,14 @@ public class EggHatchController : MonoBehaviour
             yield return null;
         }
 
+        if (shakeAudio != null)
+            shakeAudio.Stop();
+
+        if (haptics != null)
+            haptics.Stop();
+
         eggWhole.transform.position = originalPos;
 
-        // Spela partiklar
         if (particles != null)
         {
             particles.gameObject.SetActive(true);
@@ -52,11 +67,9 @@ public class EggHatchController : MonoBehaviour
 
         yield return new WaitForSeconds(0.5f);
 
-        // Visa skärvor
         eggWhole.SetActive(false);
         eggBrokenRoot.SetActive(true);
 
-        // Mycket mjukare sprick-kraft
         foreach (Transform piece in eggBrokenRoot.transform)
         {
             Rigidbody rb = piece.GetComponent<Rigidbody>();
@@ -65,26 +78,22 @@ public class EggHatchController : MonoBehaviour
                 rb.isKinematic = false;
                 rb.useGravity = true;
 
-                // Mjuk glidning + lätt fall
                 Vector3 drift = new Vector3(
                     Random.Range(-0.05f, 0.05f),
                     -0.1f,
                     Random.Range(-0.05f, 0.05f)
                 );
-                rb.AddForce(drift * 0.2f, ForceMode.Impulse);        // ⬅️ Mycket mild kraft
-                rb.AddTorque(Random.insideUnitSphere * 0.1f, ForceMode.Impulse);  // ⬅️ Mjuk rotation
+                rb.AddForce(drift * 0.2f, ForceMode.Impulse);
+                rb.AddTorque(Random.insideUnitSphere * 0.1f, ForceMode.Impulse);
             }
         }
 
-        // Visa draken tidigare
         yield return new WaitForSeconds(timeBeforeShowDragon);
         dragon.SetActive(true);
 
-        // Låt partiklarna tonas ut
         if (particles != null)
             particles.Stop(true, ParticleSystemStopBehavior.StopEmitting);
 
-        // Skärvor försvinner efter en stund
         yield return new WaitForSeconds(timeBeforeRemovePieces);
         eggBrokenRoot.SetActive(false);
     }
