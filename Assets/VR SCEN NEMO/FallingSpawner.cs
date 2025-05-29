@@ -2,39 +2,54 @@ using UnityEngine;
 
 public class FallingSpawner : MonoBehaviour
 {
-    public string[] spawnTags = { "Collectible", "Hazard" };
+    [Header("Spawn Position")]
     public float spawnRangeX = 2f;
 
     [Header("Spawn Timing")]
-    public float minSpawnInterval = 0.5f;
-    public float maxSpawnInterval = 1.2f;
+    public float startInterval = 2.0f;
+    public float minInterval = 0.5f;
+    public float intervalDecreaseRate = 0.01f; // per second
 
-    [Header("Multi-Spawn Settings")]
-    public int minObjectsPerSpawn = 1;
-    public int maxObjectsPerSpawn = 3;
+    [Header("Hazard Spawn Ratio")]
+    public float startingHazardChance = 0.2f;
+    public float maxHazardChance = 0.8f;
+    public float hazardRampRate = 0.01f; // per second
+
+    private float currentInterval;
+    private float currentHazardChance;
+    private float spawnTimer;
 
     void Start()
     {
-        ScheduleNextSpawn();
+        currentInterval = startInterval;
+        currentHazardChance = startingHazardChance;
     }
 
-    void ScheduleNextSpawn()
+    void Update()
     {
-        float interval = Random.Range(minSpawnInterval, maxSpawnInterval);
-        Invoke(nameof(Spawn), interval);
+        // Gradually decrease interval
+        if (currentInterval > minInterval)
+            currentInterval -= intervalDecreaseRate * Time.deltaTime;
+
+        // Gradually increase hazard chance
+        if (currentHazardChance < maxHazardChance)
+            currentHazardChance += hazardRampRate * Time.deltaTime;
+
+        // Count time and spawn when timer exceeds current interval
+        spawnTimer += Time.deltaTime;
+        if (spawnTimer >= currentInterval)
+        {
+            spawnTimer = 0f;
+            Spawn();
+        }
     }
 
     void Spawn()
     {
-        int count = Random.Range(minObjectsPerSpawn, maxObjectsPerSpawn + 1);
-        for (int i = 0; i < count; i++)
-        {
-            string tag = spawnTags[Random.Range(0, spawnTags.Length)];
-            float x = Random.Range(-spawnRangeX, spawnRangeX);
-            Vector3 pos = new Vector3(x, transform.position.y, transform.position.z);
-            ObjectPool.Instance.Spawn(tag, pos, Quaternion.identity);
-        }
+        string tag = Random.value < currentHazardChance ? "Hazard" : "Collectible";
+        float x = Random.Range(-spawnRangeX, spawnRangeX);
+        Vector3 pos = new Vector3(x, transform.position.y, transform.position.z);
 
-        ScheduleNextSpawn();
+        ObjectPool.Instance.Spawn(tag, pos, Quaternion.identity);
     }
 }

@@ -1,49 +1,68 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class DragonController : MonoBehaviour
 {
     [Header("Movement Settings")]
     public float moveSpeed = 2f;
-    public float leftLimit = -2f;
-    public float rightLimit = 2f;
+    public float minX = -2f;
+    public float maxX = 2f;
 
     [Header("Rotation Settings")]
-    public float rotationSpeed = 10f;
-    public float idleRotationDelay = 2f;
+    public float idleResetDelay = 2f;
+    public float forwardTilt = 20f;
 
-    private Vector2 input;
-    private float lastInputTime;
+    [Header("Model Facing Setup")]
+    public float movementBaseY = 0f;       // Actual forward direction of the dragon model
+    public float idleFacingY = 180f;       // The Y angle that faces the camera
+
+    [Header("Audio")]
+    public AudioClip collectibleSound;
+    public AudioClip hazardSound;
+
+    private AudioSource audioSource;
+    private Quaternion targetRotation;
+    private float idleTimer = 0f;
+    private bool isMoving = false;
+
+    void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+        targetRotation = Quaternion.Euler(forwardTilt, idleFacingY, 0f);
+    }
 
     void Update()
     {
-        // Get input from gamepad or keyboard
-        input = Gamepad.current != null ? Gamepad.current.leftStick.ReadValue() :
-                (Keyboard.current != null ? new Vector2(
-                    (Keyboard.current.aKey.isPressed ? -1 : 0) + (Keyboard.current.dKey.isPressed ? 1 : 0),
-                    0) : Vector2.zero);
+        float horizontal = Input.GetAxis("Horizontal");
+        Vector3 position = transform.position;
 
-        // Movement
-        if (Mathf.Abs(input.x) > 0.01f)
+        if (Mathf.Abs(horizontal) > 0.01f)
         {
-            float newX = Mathf.Clamp(transform.position.x + input.x * moveSpeed * Time.deltaTime, leftLimit, rightLimit);
-            transform.position = new Vector3(newX, transform.position.y, transform.position.z);
-            lastInputTime = Time.time;
+            isMoving = true;
+            idleTimer = 0f;
 
-            // Rotate left/right
-            float targetY = input.x < 0 ? 270f : 90f;
-            Quaternion targetRotation = Quaternion.Euler(0f, targetY, 0f);
-            transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
+            position.x += horizontal * moveSpeed * Time.deltaTime;
+            position.x = Mathf.Clamp(position.x, minX, maxX);
+            transform.position = position;
+
+            // Movement turns (face-first)
+            float yRot = movementBaseY + (horizontal > 0 ? 90f : -90f);
+            targetRotation = Quaternion.Euler(forwardTilt, yRot, 0f);
         }
         else
         {
-            // Rotate back to forward-facing (Y = 180) after idle time
-            if (Time.time - lastInputTime >= idleRotationDelay)
+            if (isMoving)
             {
-                Quaternion targetRotation = Quaternion.Euler(0f, 180f, 0f);
-                transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
+                idleTimer += Time.deltaTime;
+            }
+
+            if (idleTimer >= idleResetDelay)
+            {
+                isMoving = false;
+                targetRotation = Quaternion.Euler(forwardTilt, idleFacingY, 0f);
             }
         }
+
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 10f * Time.deltaTime);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -51,12 +70,22 @@ public class DragonController : MonoBehaviour
         if (other.CompareTag("Collectible"))
         {
             GameManager.instance.AddScore(100);
+            PlaySound(collectibleSound);
             other.gameObject.SetActive(false);
         }
         else if (other.CompareTag("Hazard"))
         {
             GameManager.instance.TakeDamage(1);
+            PlaySound(hazardSound);
             other.gameObject.SetActive(false);
+        }
+    }
+
+    private void PlaySound(AudioClip clip)
+    {
+        if (clip != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(clip);
         }
     }
 }
