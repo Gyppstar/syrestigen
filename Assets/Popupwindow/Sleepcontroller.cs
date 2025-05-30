@@ -65,11 +65,11 @@ public class SleepController : MonoBehaviour
         if (sleepParticles != null)
             sleepParticles.Play();
 
-        Invoke(nameof(ChangeScene), 5f);
+        Invoke(nameof(ChangeScene), 3f);
     }
 
     private void ChangeScene()
     {
-        SceneManager.LoadScene("VRscene");
+        SceneManager.LoadScene("VRscene", LoadSceneMode.Single);
     }
 }
