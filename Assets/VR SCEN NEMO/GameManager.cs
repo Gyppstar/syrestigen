@@ -76,6 +76,6 @@ public class GameManager : MonoBehaviour
     public void BackToMenu()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene("MainMenu"); // <- byt till ditt meny-scen-namn
+        SceneManager.LoadScene("UIstart.scene"); // <- byt till ditt meny-scen-namn
     }
 }

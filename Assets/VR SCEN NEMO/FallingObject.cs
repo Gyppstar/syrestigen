@@ -2,27 +2,23 @@ using UnityEngine;
 
 public class FallingObject : MonoBehaviour
 {
-    [Header("Despawn Settings")]
-    public float despawnY = -8f;
+    [Header("Settings")]
+    public float fallSpeed = 1.5f; // Local speed per object
 
-    [Header("Lock Settings")]
-    public float lockZ = 17f;
-
-    void Update()
+    private void Update()
     {
-        // Use global fall speed from GameManager
-        float fallSpeed = GameManager.instance.currentFallSpeed;
-
-        // Fall movement
+        // Move object downward at constant speed
         transform.Translate(Vector3.down * fallSpeed * Time.deltaTime);
 
-        // Lock Z position
+        // Lock Z position to stay on gameplay plane
         Vector3 pos = transform.position;
-        pos.z = lockZ;
+        pos.z = 17f;
         transform.position = pos;
 
-        // Despawn if too low
-        if (transform.position.y < despawnY)
+        // Despawn when below screen
+        if (transform.position.y < -8f)
+        {
             gameObject.SetActive(false);
+        }
     }
 }
