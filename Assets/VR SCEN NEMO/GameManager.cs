@@ -1,81 +1,81 @@
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using TMPro;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
-    [Header("UI Elements")]
-    public TMP_Text scoreText;
-    public Image[] hearts;
+    [Header("Gameplay")]
+    public int score = 0;
+    public int lives = 3;
 
-    [Header("Falling Speed Control")]
-    public float currentFallSpeed = 1f;
-    public float maxFallSpeed = 5f;
-    public float fallSpeedIncreaseRate = 0.1f;
+    [Header("UI")]
+    public TextMeshProUGUI scoreText;
+    public GameObject[] hearts;
 
-    private int score = 0;
-    private int health;
+    [Header("Game Over UI")]
+    public GameObject gameOverPanel;
+    public TextMeshProUGUI finalScoreText;
 
-    void Awake()
+    private void Awake()
     {
         if (instance == null)
-        {
             instance = this;
-            health = hearts.Length;
-            UpdateUI();
-        }
         else
-        {
             Destroy(gameObject);
-        }
     }
 
-    void Update()
+    private void Start()
     {
-        // Speed ramps up over time
-        if (currentFallSpeed < maxFallSpeed)
-        {
-            currentFallSpeed += fallSpeedIncreaseRate * Time.deltaTime;
-        }
+        UpdateScoreText();
+        gameOverPanel.SetActive(false);
     }
 
     public void AddScore(int amount)
     {
         score += amount;
-        Debug.Log("Score updated to: " + score);
-        UpdateUI();
+        UpdateScoreText();
     }
 
     public void TakeDamage(int amount)
     {
-        health -= amount;
-        Debug.Log("Took damage. Health: " + health);
-        UpdateUI();
+        lives -= amount;
 
-        if (health <= 0)
+        if (lives >= 0 && lives < hearts.Length)
+        {
+            hearts[lives].SetActive(false);
+        }
+
+        if (lives <= 0)
         {
             GameOver();
         }
     }
 
-    void UpdateUI()
+    void UpdateScoreText()
     {
-        if (scoreText != null)
-        {
-            scoreText.text = "Score: " + score;
-        }
-
-        for (int i = 0; i < hearts.Length; i++)
-        {
-            hearts[i].enabled = i < health;
-        }
+        scoreText.text = "Score: " + score;
     }
 
     void GameOver()
     {
-        Debug.Log("Game Over!");
-        Time.timeScale = 0f;
+        finalScoreText.text = "Poäng: " + score;
+        gameOverPanel.SetActive(true);
+        Time.timeScale = 0f; // Pausar spelet
+    }
+
+    // Kallas av knappen "Spela igen"
+    public void RestartGame()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    // Kallas av knappen "Till meny"
+    public void BackToMenu()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("UIstart.scene"); // <- byt till ditt meny-scen-namn
     }
 }
